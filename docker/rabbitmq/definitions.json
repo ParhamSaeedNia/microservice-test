@@ -1,0 +1,60 @@
+{
+  "users": [
+    {
+      "name": "market",
+      "password_hash": "61406VoMnqZMChRQx3Ys/fhyP4Qxu90zdbwXO5Yj3J1Lb5N1",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": "administrator"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "market",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "vhosts": [{ "name": "/" }],
+  "exchanges": [
+    {
+      "name": "notifications.dlx",
+      "vhost": "/",
+      "type": "direct",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "queues": [
+    {
+      "name": "notifications.send",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-dead-letter-exchange": "notifications.dlx",
+        "x-dead-letter-routing-key": "notifications.send.dlq"
+      }
+    },
+    {
+      "name": "notifications.send.dlq",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    }
+  ],
+  "bindings": [
+    {
+      "source": "notifications.dlx",
+      "vhost": "/",
+      "destination": "notifications.send.dlq",
+      "destination_type": "queue",
+      "routing_key": "notifications.send.dlq",
+      "arguments": {}
+    }
+  ]
+}

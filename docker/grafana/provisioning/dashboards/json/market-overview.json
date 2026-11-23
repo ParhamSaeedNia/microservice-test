@@ -1,0 +1,48 @@
+{
+  "uid": "market-overview",
+  "title": "Market overview",
+  "schemaVersion": 39,
+  "tags": ["market"],
+  "time": { "from": "now-1h", "to": "now" },
+  "timezone": "browser",
+  "refresh": "10s",
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Request rate",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (service) (rate(http_request_duration_seconds_count[5m]))"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "p95 latency",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "s" } },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum by (service, le) (rate(http_request_duration_seconds_bucket[5m])))"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Consume counters",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "refId": "A", "expr": "sum by (service) (outbox_events_written_total)" },
+        { "refId": "B", "expr": "sum by (service) (kafka_messages_consumed_total)" },
+        { "refId": "C", "expr": "sum by (service) (rabbitmq_messages_consumed_total)" },
+        { "refId": "D", "expr": "sum by (service) (notifications_sent_total)" }
+      ]
+    }
+  ]
+}
